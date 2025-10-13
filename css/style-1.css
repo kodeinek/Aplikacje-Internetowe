@@ -71,40 +71,12 @@ body {
   border-radius: 10px;
 }
 
-/* RESPONSYWNOŚĆ */
-@media (max-width: 480px) {
-  #content {
-    display: block;
-    width: 90%;
-    padding: 10px;
-  }
+ul {
+  list-style-type: circle;
+  padding-left: 25px;
+  color: darkcyan;
+  font-size: 16px;
+  border-left: 3px solid #336699;
 
-  #content div {
-    margin-bottom: 20px;
-  }
 
-  h1 {
-    font-size: 1.8em;
-  }
-
-  h2 {
-    font-size: 1.4em;
-  }
-
-  h3 {
-    font-size: 1.2em;
-  }
-
-  p {
-    font-size: 14px;
-  }
-
-  .inside {
-    width: 100%;
-    height: auto;
-  }
-
-  header {
-    padding-top: 20px;
-  }
 }
