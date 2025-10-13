@@ -1,0 +1,110 @@
+header {
+  background: linear-gradient(to right, #222, #6a89cc);
+  padding-top: 40px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #222;
+}
+
+h2 {
+  text-align: center;
+}
+
+h3 {
+  font-family: 'Poppins', sans-serif;
+  color: #0044cc;
+}
+
+p {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.kontener {
+  min-height: 100vh;
+}
+
+#content {
+  display: flex;
+  gap: 20px;
+  width: 900px;
+  height: auto;
+  border: 2px solid black;
+  border-radius: 15px;
+  margin: 0 auto;
+  padding: 10px;
+  justify-content: center;
+  background-color: #222222;
+}
+
+#content div {
+  border: 2px solid black;
+  border-radius: 15px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #cccccc;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #333;
+  color: white;
+}
+
+body {
+  background-color: #b3d4fc;
+}
+
+.inside {
+  display: block;
+  width: 250px;
+  height: 250px;
+  margin: 0 auto 10px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* RESPONSYWNOŚĆ */
+@media (max-width: 480px) {
+  #content {
+    display: block;
+    width: 90%;
+    padding: 10px;
+  }
+
+  #content div {
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+  }
+
+  h2 {
+    font-size: 1.4em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  p {
+    font-size: 14px;
+  }
+
+  .inside {
+    width: 100%;
+    height: auto;
+  }
+
+  header {
+    padding-top: 20px;
+  }
+}
