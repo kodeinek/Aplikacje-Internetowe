@@ -1,0 +1,58 @@
+.lista {
+  background-color: purple;
+  width: 45rem;
+  height: auto;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.search_bar{
+  background-color: #888888;
+  height: 3rem;
+}
+.instance{
+  display: flex;
+  background-color: darkcyan ;
+  height: 2.9em;
+}
+.description{
+  background-color: dodgerblue;
+  height: 1.3em;
+  width: 20em;
+  margin: auto auto;
+
+
+}
+.date{
+  background-color: dodgerblue;
+  height: 1.3em;
+  width: 20em;
+  margin: auto auto;
+
+}
+.new_listing{
+  display: flex;
+
+  background-color: white;
+  order: 1;
+  height: 2.5em;
+
+}
+.delete{
+  background-color: red;
+  height: 1.5em;
+  width: 2em;
+  margin: auto auto;
+
+}
+.save{
+  background-color: green;
+  height: 1.5em;
+  width: 2em;
+  margin: auto auto;
+}
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
