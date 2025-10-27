@@ -1,34 +1,47 @@
 <!doctype html>
-<html>
+<html class="no-js" lang="">
 
 <head>
-  <meta charset="utf-8">
-  <title>lista</title>
+  <title></title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/lista.js" defer></script>
+  <script src="js/app.js" defer></script>
+
+  <title>Maps with Leaflet</title>
+  <link rel="stylesheet" href="leaflet-1.7.1/leaflet.css" />
+  <script src="leaflet-1.7.1/leaflet-src.js"></script>
+  <script src="leaflet-1.7.1/leaflet-providers.js"></script>
+  <script src="leaflet-1.7.1/leaflet-image.js"></script>
 </head>
 
 <body>
-<div class="lista">
-  <div class="search_bar">
-    <input type="text" placeholder="Szukaj...">
+
+
+  <div class = "page">
+
+    <div class = "map">
+
+      <div id="map"></div>
+      <button id="getLocation">Get Current Location</button>
+      <button id="saveButton">Save Raster Map</button>
+
+    </div>
+    <canvas id="rasterMap"></canvas>
+
+    <canvas id = "shuffledPuzzle">
+
+
+    </canvas>
+
+
+    <canvas id = "puzzleResult">
+
+
+    </canvas>
+
+
+
   </div>
 
-<!--  <div class="instance">-->
-<!--    <div class="description"></div>-->
-<!--    <div class="date"></div>-->
-<!--    <div class="delete"></div>-->
-<!--  </div>-->
-
-  <div class="new_listing">
-    <div class="description">
-      <input type="text" placeholder="Opis...">
-    </div>
-    <div class="date">
-      <input type="date">
-    </div>
-    <div class="save">+</div>
-  </div>
-</div>
 </body>
+
 </html>
