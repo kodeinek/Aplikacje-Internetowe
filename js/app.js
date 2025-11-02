@@ -1,277 +1,119 @@
-let map = L.map('map').setView([53.430127, 14.564802], 18);
-// L.tileLayer.provider('OpenStreetMap.DE').addTo(map);
-L.tileLayer.provider('Esri.WorldImagery').addTo(map);
-let marker = L.marker([53.430127, 14.564802]).addTo(map);
-marker.bindPopup("<strong>Hello!</strong><br>This is a popup.");
 
 
-let rasterMap = document.getElementById("rasterMap");
-let rasterContext = rasterMap.getContext("2d");
+class weatherApp{
+  constructor(apiKey, resultBlock) {
+    this.apiKey = apiKey;
+    this.resultBlock = document.getElementById("resultBlock");
+    this.currentWeather = `https://api.openweathermap.org/data/2.5/weather?q=query&appid=${apiKey}&units=metric&lang=pl`;
+    this.fiveDayWeather = `https://api.openweathermap.org/data/2.5/forecast?q=query&appid=${apiKey}&units=metric&lang=pl`;
 
-document.getElementById("saveButton").addEventListener("click", function () {
-  leafletImage(map, function (err, canvas) {
-    rasterContext.drawImage(canvas, 0, 0, 300, 150);
-  });
-  initPuzzle();
+    this.currentWeatherJSON = undefined;
+    this.fiveDayWeartherJSON = undefined;
+  }
+
+
+  XMLReq(query){
+    let url = this.currentWeather.replace("query",query);
+    let req = new XMLHttpRequest();
+    req.open("GET",url,true);
+    req.addEventListener("load",()=>{
+      this.currentWeatherJSON = JSON.parse(req.responseText);
+      //console.log(req);
+      this.drawCurrent();
+    })
+    req.send();
+  };
+  fetchReq(query){
+    const url = this.fiveDayWeather.replace("query",query);
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        this.fiveDayWeartherJSON = data.list;
+        this.drawFuture();
+      })
+  }
+  drawCurrent(){
+    {
+      const date = new Date(this.currentWeatherJSON.dt * 1000).toLocaleString();
+      const temp = this.currentWeatherJSON.main.temp;
+      const feel = this.currentWeatherJSON.main.feels_like;
+      const iconSrc = `http://openweathermap.org/img/w/${this.currentWeatherJSON.weather[0].icon}.png`;
+      const desc = this.currentWeatherJSON.weather[0].description;
+      this.newWindow(date, temp, feel, iconSrc, desc);
+    }
+  }
+  drawFuture(){
+    for(const entry of this.fiveDayWeartherJSON){
+      const date = new Date(entry.dt * 1000).toLocaleString();
+      const temp = entry.main.temp;
+      const feel = entry.main.feels_like;
+      const iconSrc = `http://openweathermap.org/img/w/${entry.weather[0].icon}.png`;
+      const desc = entry.weather[0].description;
+      this.newWindow(date, temp, feel, iconSrc, desc);
+    }
+  }
+  async draw(query) {
+    if(!query) return;
+    this.resultBlock.innerHTML = "";
+    this.XMLReq(query);
+    this.fetchReq(query);
+  }
+
+  newWindow(_date, _temp, _feel, _iconSrc, _desc) {
+
+    const block = document.createElement("div");
+    block.className = "result";
+
+    const date = document.createElement("div");
+    date.className = "date";
+    date.innerHTML = _date;
+    block.appendChild(date);
+
+    const icon = document.createElement("img");
+    icon.className = "icon";
+    icon.src = _iconSrc;
+    block.appendChild(icon);
+
+    const sidePanel = document.createElement("div");
+    sidePanel.className = "side-panel";
+
+    const temp = document.createElement("div");
+    temp.className = "temp";
+    temp.innerHTML = `${_temp} &deg;C`;
+    sidePanel.appendChild(temp);
+
+    const feel = document.createElement("div");
+    feel.className = "feel";
+    feel.innerHTML = `odczuwalna: ${_feel} &deg;C`;
+    sidePanel.appendChild(feel);
+
+    const desc = document.createElement("div");
+    desc.className = "description";
+    desc.innerHTML = _desc;
+    sidePanel.appendChild(desc);
+
+    block.appendChild(sidePanel);
+
+    this.resultBlock.appendChild(block);
+  }
+
+  newRequest() {
+
+    const req = new XMLHttpRequest();
+
+  }
+
+}
+const app = new weatherApp("dfecb8c81d3b6e0bb884feedbe338a1a", "resultBlock");
+
+document.getElementById("searchButton").addEventListener("click", () => {
+  const query = document.querySelector("#search input").value;
+  app.draw(query);
 
 });
 
-document.getElementById("getLocation").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    console.log("Brak geolokalizacji.");
-    return;
-  }
 
-  navigator.geolocation.getCurrentPosition(position => {
-    let lat = position.coords.latitude;
-    let lon = position.coords.longitude;
-
-    // Ustaw widok mapy na aktualną pozycję
-    map.setView([lat, lon], 16); // druga liczba to zoom
-
-    // Dodaj marker z pinem na mapę
-    let locationMarker = L.marker([lat, lon]).addTo(map);
-
-    locationMarker.bindPopup(
-      `<br>Latitude: ${lat.toFixed(6)}<br>Longitude: ${lon.toFixed(6)}`
-    ).openPopup();  }, err => {
-    console.error("Błąd geolokalizacji:", err);
-  });
-});
-
-
-if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-  Notification.requestPermission();
-}
-
-function showNotification(title, options) {
-  if (Notification.permission === "granted") {
-    new Notification(title, options);
-  }
-}
-const initPuzzle = () => {
-  let shuffled = document.getElementById("shuffledPuzzle");
-  let shuffledContext = shuffled.getContext('2d');
-
-  let result = document.getElementById("puzzleResult");
-  let resultContext= result.getContext('2d');
-  let draggedPiece = null;
-
-
-  function getMousePos(canvas, evt) {
-    let rect = canvas.getBoundingClientRect();
-    return {
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top
-    };
-  }
-  function findPieceAtPosition(pieces, pos) {
-    for (let i = pieces.length - 1; i >= 0; i--) {
-      let p = pieces[i];
-      if (
-        pos.x > p.x && pos.x < p.x + p.width &&
-        pos.y > p.y && pos.y < p.y + p.height
-      ) {
-        return { piece: p, index: i };
-      }
-    }
-    return null;
-  }
-
-  const floatingCanvas = document.createElement("canvas");
-  const floatingContext = floatingCanvas.getContext("2d");
-  floatingCanvas.style.position = "fixed";
-  floatingCanvas.style.pointerEvents = "none";
-  floatingCanvas.style.zIndex = 1000;
-  floatingCanvas.style.display = "none";
-  document.body.appendChild(floatingCanvas);
-
-
-  leafletImage(map, function (err, sourceImg) {
-    let Width = sourceImg.width;
-    let Height = sourceImg.height;
-    shuffled.width = Width;
-    shuffled.height = Height;
-    shuffled.style.width = Width + "px";
-    shuffled.style.height = Height + "px";
-
-    result.width = Width;
-    result.height = Height;
-    result.style.width = Width + "px";
-    result.style.height = Height + "px";
-
-    let pieces = [];
-    let piecesResult =[];
-    let rows = 4;
-    let cols = 4;
-    let pieceWidth = Width / cols;
-    let pieceHeight = Height / rows;
-
-
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-
-        piecesResult.push({
-          x: col * pieceWidth,
-          y: row * pieceHeight,
-          width: pieceWidth,
-          height: pieceHeight,
-          srcX: col * pieceWidth,
-          srcY: row * pieceHeight,
-          empty: true,
-
-        });
-
-
-        pieces.push({
-          x: col * pieceWidth,
-          y: row * pieceHeight,
-          width: pieceWidth,
-          height: pieceHeight,
-          srcX: col * pieceWidth,
-          srcY: row * pieceHeight,
-          empty: false,
-        });
-      }
-    }
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
-
-    shuffleArray(pieces);
-
-    pieces.forEach((piece, index) => {
-      const row = Math.floor(index / cols);
-      const col = index % cols;
-      piece.x = col * pieceWidth;
-      piece.y = row * pieceHeight;
-    });
-
-    let dragging = false;
-    let draggedX = 0;
-    let draggedY = 0;
-    let offsetX = 0, offsetY = 0;
-
-
-    function startDrag(canvas, piecesArray, event) {
-      let pos = getMousePos(canvas, event);
-      let found = findPieceAtPosition(piecesArray, pos);
-
-      // Dla piecesResult dodatkowo sprawdzenie czy puzzel nie jest pusty
-      if (found && (piecesArray === piecesResult ? !found.piece.empty : true)) {
-        draggedPiece = found.piece;
-        dragging = true;
-        offsetX = pos.x - draggedPiece.x;
-        offsetY = pos.y - draggedPiece.y;
-
-        floatingCanvas.width = draggedPiece.width;
-        floatingCanvas.height = draggedPiece.height;
-
-        floatingContext.clearRect(0, 0, draggedPiece.width, draggedPiece.height);
-        floatingContext.drawImage(
-          sourceImg,
-          draggedPiece.srcX, draggedPiece.srcY, draggedPiece.width, draggedPiece.height,
-          0, 0, draggedPiece.width, draggedPiece.height
-        );
-        floatingContext.strokeRect(0, 0, draggedPiece.width, draggedPiece.height);
-
-        floatingCanvas.style.display = "block";
-        updateFloatingCanvasPosition(event.clientX, event.clientY);
-      }
-    }
-
-    shuffled.addEventListener("mousedown", e => {
-      startDrag(shuffled, pieces, e);
-    });
-
-    result.addEventListener("mousedown", e => {
-      startDrag(result, piecesResult, e);
-    });
-    function updateFloatingCanvasPosition(clientX, clientY) {
-      floatingCanvas.style.left = (clientX - offsetX) + "px";
-      floatingCanvas.style.top = (clientY - offsetY) + "px";
-    }
-
-    window.addEventListener("mousemove", e => {
-      if (!dragging || !draggedPiece) return;
-
-      updateFloatingCanvasPosition(e.clientX, e.clientY);
-      drawPieces(draggedPiece);
-    });
-    function checkPuzzleSolved(piecesResult) {
-      for (let slot of piecesResult) {
-        if (slot.empty) return false;
-        if (slot.srcX !== slot.x || slot.srcY !== slot.y) return false;
-      }
-      showNotification("Puzzle", { body: "Puzzle solved" });
-      return true;
-    }
-
-
-    window.addEventListener("mouseup", e => {
-      if (!dragging || !draggedPiece) return;
-
-      dragging = false;
-
-      let posResult = getMousePos(result, e);
-
-      let inResultCanvas = posResult.x >= 0 && posResult.x <= result.width &&
-        posResult.y >= 0 && posResult.y <= result.height;
-
-      if (inResultCanvas) {
-        let targetSlot = piecesResult.find(s =>
-          posResult.x > s.x && posResult.x < s.x + s.width &&
-          posResult.y > s.y && posResult.y < s.y + s.height &&
-          s.empty
-        );
-
-        if (targetSlot) {
-          targetSlot.srcX = draggedPiece.srcX;
-          targetSlot.srcY = draggedPiece.srcY;
-          targetSlot.empty = false;
-
-          draggedPiece.empty = true;
-        }
-      }
-
-      floatingCanvas.style.display = "none";
-      draggedPiece = null;
-      drawPieces();
-      checkPuzzleSolved(piecesResult);
-    });
-    const drawPieces = (draggedPiece=null) =>{
-      shuffledContext.clearRect(0, 0, shuffled.width, shuffled.height);
-      resultContext.clearRect(0, 0, result.width, result.height);
-
-      pieces.forEach(p => {
-        if (draggedPiece !== p && !p.empty) {
-          shuffledContext.drawImage(
-            sourceImg,
-            p.srcX, p.srcY, p.width, p.height,
-            p.x, p.y, p.width, p.height
-          );
-          shuffledContext.strokeRect(p.x, p.y, p.width, p.height);
-        }
-      });
-
-      piecesResult.forEach(p => {
-        if (!p.empty) {
-          resultContext.drawImage(
-            sourceImg,
-            p.srcX, p.srcY, p.width, p.height,
-            p.x, p.y, p.width, p.height
-          );
-        }
-        resultContext.strokeRect(p.x, p.y, p.width, p.height);
-      });
-    }
-    drawPieces();
-  });
-
-}
 
 
 
