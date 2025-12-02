@@ -1,23 +1,3 @@
-# Include your project-specific ignores in this file
-# Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
-# Useful .gitignore templates: https://github.com/github/gitignore
-node_modules
-dist
-.cache
-.editorconfig
-icon.png
-img
-webpack.common.js
-.gitattributes
-lab-d
-.~lock.AI-LD-gr3-jaroszewicz-łukasz.docx#
-webpack.config.prod.js
-robots.txt
-404.html
-site.webmanifest
-webpack.config.dev.js
-favicon.ico
-icon.svg
-AI-LD-gr3-jaroszewicz-łukasz.docx
-package.json
-LICENSE.txt
+.idea
+/config/config.php
+/data.db
